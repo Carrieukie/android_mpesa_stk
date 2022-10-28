@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.konan.properties.Properties
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -31,18 +33,22 @@ android {
         }
     }
 
-//    buildTypes.each {
-//        Properties properties = new Properties()
-//        properties.load(project.rootProject.file("local.properties").newDataInputStream())
-//
-//        it.buildConfigField(
-//            "String",
-//            'CONSUMER_KEY',
-//            "\"${properties.getProperty("CONSUMER_KEY")}\""
-//                    it . buildConfigField 'String',
-//            'CONSUMER_SECRET',
-//            "\"${properties.getProperty("CONSUMER_SECRET")}\""
-//    }
+    buildTypes.all {
+        val properties = Properties()
+        properties.load(project.rootProject.file("local.properties").inputStream())
+
+        buildConfigField(
+            type = "String",
+            name = "CONSUMER_KEY",
+            value = "\"${properties.getProperty("CONSUMER_KEY")}\""
+        )
+
+        buildConfigField(
+            type = "String",
+            name = "CONSUMER_SECRET",
+            value = "\"${properties.getProperty("CONSUMER_SECRET")}\""
+        )
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
