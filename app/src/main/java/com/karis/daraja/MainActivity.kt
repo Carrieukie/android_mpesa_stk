@@ -66,7 +66,7 @@ class MainActivity : ComponentActivity() {
     private fun sendStkPush(amount: String, phoneNumber: String) {
         val stkPushRequest = STKPushRequest(
             businessShortCode = Constants.BUSINESS_SHORT_CODE,
-            password = getPassword(Constants.BUSINESS_SHORT_CODE, Constants.PASSKEY, timestamp),
+            password = getPassword(Constants.BUSINESS_SHORT_CODE, BuildConfig.PASS_KEY, timestamp),
             timestamp = timestamp,
             transactionType = "CustomerPayBillOnline",
             amount = amount,

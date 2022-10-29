@@ -48,6 +48,12 @@ android {
             name = "CONSUMER_SECRET",
             value = "\"${properties.getProperty("CONSUMER_SECRET")}\""
         )
+
+        buildConfigField(
+            type = "String",
+            name = "PASS_KEY",
+            value = "\"${properties.getProperty("PASS_KEY")}\""
+        )
     }
 
     compileOptions {
