@@ -3,15 +3,14 @@ import org.jetbrains.kotlin.konan.properties.Properties
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-
 }
 
 android {
-    namespace = ("com.github.daraja")
+    namespace = ("com.example.daraja")
     compileSdk = 33
 
     defaultConfig {
-        applicationId = "com.karis.daraja"
+        applicationId = "com.example.daraja"
         minSdk = 21
         targetSdk = 33
         versionCode = 1

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.daraja
+package com.example.daraja
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -35,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.github.daraja.driver.DarajaDriver
 import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.ui.theme.DarajaTheme
+import com.example.daraja.ui.theme.DarajaTheme
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp

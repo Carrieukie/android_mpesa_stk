@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.daraja
+package com.example.daraja
 
 internal object Constants {
     const val BUSINESS_SHORT_CODE = "174379"

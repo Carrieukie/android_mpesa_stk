@@ -1,0 +1,23 @@
+  *.iml
+.gradle
+/local.properties
+/.idea/libraries
+/.idea/*
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+publishingInfo.txt
+
+
+app/app.iml
+daraja/daraja.iml
+
+#Fastlane
+fastlane/report.xml
+fastlane/README.md
+
+#Build Script
+buildSrc/build

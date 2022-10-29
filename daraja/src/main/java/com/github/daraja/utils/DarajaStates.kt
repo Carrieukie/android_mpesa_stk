@@ -16,9 +16,8 @@
 package com.github.daraja.utils
 
 sealed class DarajaStates<R>(
-    data: R?
+    val data: R?
 ) {
-    class InitialState<T>(data: T?) : DarajaStates<T>(data)
     class LoadingToken<T>(data: T?) : DarajaStates<T>(data)
     class TokenFetchedSuccess<T>(data: T) : DarajaStates<T>(data)
     class TokenFetchedError<T>(data: T) : DarajaStates<T>(data)
