@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Eric Kariuki Kimani.
+ * Copyright $YEAR Eric Kariuki Kimani
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,11 +13,3 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.karis.daraja.utils
-
-internal object Constants {
-    const val CONNECT_TIMEOUT = 60 * 1000
-    const val READ_TIMEOUT = 60 * 1000
-    const val WRITE_TIMEOUT = 60 * 1000
-    const val BASE_URL = "https://sandbox.safaricom.co.ke/"
-}
