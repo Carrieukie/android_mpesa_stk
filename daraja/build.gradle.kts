@@ -1,15 +1,16 @@
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.android")
+    id("maven-publish")
 }
 
 android {
-    namespace = ("com.karis.daraja")
-    compileSdk = 32
+    namespace = ("com.github.daraja")
+    compileSdk = 33
 
     defaultConfig {
         minSdk = 16
-        targetSdk = 32
+        targetSdk = 33
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -56,4 +57,18 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.3")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.4.0")
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+
+            create<MavenPublication>("daraja") {
+                from(project.components["release"])
+                groupId = "com.github.carrieukie"
+                artifactId = "image-preview-compose"
+                version = "1.0.0"
+            }
+        }
+    }
 }

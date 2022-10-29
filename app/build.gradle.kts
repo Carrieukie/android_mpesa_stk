@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-    namespace = ("com.karis.daraja")
+    namespace = ("com.github.daraja")
     compileSdk = 33
 
     defaultConfig {
