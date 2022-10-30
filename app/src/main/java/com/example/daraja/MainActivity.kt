@@ -33,9 +33,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
+import com.example.daraja.ui.theme.DarajaTheme
 import com.github.daraja.driver.DarajaDriver
 import com.github.daraja.model.requests.STKPushRequest
-import com.example.daraja.ui.theme.DarajaTheme
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp

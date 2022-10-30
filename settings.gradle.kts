@@ -12,6 +12,6 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Daraja"
+rootProject.name = "android_mpesa_stk"
 include(":app")
 include(":daraja")
