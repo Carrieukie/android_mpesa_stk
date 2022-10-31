@@ -107,7 +107,7 @@ class MainActivity : ComponentActivity() {
                     is Resource.Error -> {
                         Toast.makeText(
                             applicationContext,
-                            "${result.error?.message}",
+                            "${result.errorMessage ?: result.error?.message}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                     is Resource.Success -> {
                         Toast.makeText(
                             applicationContext,
-                            "Success: ${result.data?.otpResult?.message}",
+                            "Success: ${result.data?.otpResult}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }

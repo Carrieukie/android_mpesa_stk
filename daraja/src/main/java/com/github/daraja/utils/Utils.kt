@@ -16,6 +16,13 @@
 package com.github.daraja.utils
 
 import android.util.Base64
+import com.github.daraja.model.response.ErrorResponse
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
+import retrofit2.HttpException
+import timber.log.Timber
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -38,4 +45,45 @@ fun getPassword(businessShortCode: String, passkey: String, timestamp: String): 
     val str = businessShortCode + passkey + timestamp
     // encode the password to Base64
     return Base64.encodeToString(str.toByteArray(), Base64.NO_WRAP)
+}
+
+suspend fun <T> safeApiCall(
+    dispatcher: CoroutineDispatcher,
+    apiCall: suspend () -> T
+): Resource<T> {
+    return withContext(dispatcher) {
+        try {
+            Resource.Success(apiCall.invoke())
+        } catch (throwable: Throwable) {
+            Timber.e(throwable)
+            when (throwable) {
+                is IOException -> Resource.Error()
+                is HttpException -> {
+                    val stringErrorBody = errorBodyAsString(throwable)
+                    if (stringErrorBody != null) {
+                        val errorResponse = convertStringErrorResponseToJsonObject(stringErrorBody)
+                        Resource.Error(
+                            errorMessage = errorResponse?.errorMessage,
+                            throwable = throwable
+                        )
+                    } else {
+                        Resource.Error(null, null)
+                    }
+                }
+                else -> {
+                    Resource.Error(null, null)
+                }
+            }
+        }
+    }
+}
+
+private fun convertStringErrorResponseToJsonObject(jsonString: String): ErrorResponse? {
+    val gson = Gson()
+    return gson.fromJson(jsonString, ErrorResponse::class.java)
+}
+
+fun errorBodyAsString(throwable: HttpException): String? {
+    val reader = throwable.response()?.errorBody()?.charStream()
+    return reader?.use { it.readText() }
 }

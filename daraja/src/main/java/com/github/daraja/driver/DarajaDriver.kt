@@ -26,6 +26,7 @@ import com.github.daraja.model.response.STKPushResponse
 import com.github.daraja.services.STKPushService
 import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
+import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
@@ -43,49 +44,47 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
             )
         )
 
-        when (val getAccessTokenResult = getAccessToken(firstSTKPushService)) {
+        when (val accessTokenResult = getAccessToken(firstSTKPushService)) {
             is Resource.Error -> {
                 emit(
                     Resource.Error(
-                        data = darajaStkPushState.copy(
-                            error = getAccessTokenResult.error
-                        ),
-                        throwable = getAccessTokenResult.error!!
+                        errorMessage = accessTokenResult.errorMessage,
+                        throwable = accessTokenResult.error
                     )
                 )
             }
             is Resource.Success -> {
                 emit(
                     Resource.Loading(
-                        darajaStkPushState.copy(
-                            accessToken = getAccessTokenResult.data!!.accessToken
-                        )
+                        accessTokenResult.data?.let {
+                            darajaStkPushState.copy(
+                                accessToken = it.accessToken
+                            )
+                        }
                     )
                 )
 
                 when (val sendOtpResult =
-                    sendOtp(
-                        firstSTKPushService = firstSTKPushService,
-                        stkPushRequest = stkPushRequest,
-                        token = getAccessTokenResult.data.accessToken
-                    )
+                    accessTokenResult.data?.let {
+                        sendOtp(
+                            firstSTKPushService = firstSTKPushService,
+                            stkPushRequest = stkPushRequest,
+                            token = it.accessToken
+                        )
+                    }
                 ) {
                     is Resource.Error -> {
                         emit(
                             Resource.Error(
-                                data = darajaStkPushState.copy(
-                                    error = sendOtpResult.error
-                                ),
-                                throwable = sendOtpResult.error!!
+                                errorMessage = sendOtpResult.errorMessage,
+                                throwable = sendOtpResult.error
                             )
                         )
                     }
                     is Resource.Success -> {
                         emit(
                             Resource.Success(
-                                darajaStkPushState.copy(
-                                    otpResult = sendOtpResult.data
-                                )
+                                darajaStkPushState.copy(otpResult = sendOtpResult.data)
                             )
                         )
                     }
@@ -98,14 +97,12 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
     }.flowOn(Dispatchers.IO)
 
     override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {
-        return try {
+        return safeApiCall(Dispatchers.IO) {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
 
             val response = firstSTKPushService.accessToken(authToken)
-            Resource.Success(response)
-        } catch (e: Exception) {
-            return Resource.Error(e)
+            response
         }
     }
 
@@ -114,11 +111,9 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
         firstSTKPushService: STKPushService,
         stkPushRequest: STKPushRequest
     ): Resource<STKPushResponse> {
-        return try {
+        return safeApiCall(Dispatchers.IO) {
             val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
-            Resource.Success(response)
-        } catch (e: Exception) {
-            return Resource.Error(e)
+            response
         }
     }
 
