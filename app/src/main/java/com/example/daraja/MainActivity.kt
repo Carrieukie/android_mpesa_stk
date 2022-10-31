@@ -117,7 +117,7 @@ class MainActivity : ComponentActivity() {
                     is Resource.Success -> {
                         Toast.makeText(
                             applicationContext,
-                            "Success: ${result.data?.otpResult}",
+                            "${result.data?.otpResult?.customerMessage}",
                             Toast.LENGTH_SHORT
                         ).show()
                     }
