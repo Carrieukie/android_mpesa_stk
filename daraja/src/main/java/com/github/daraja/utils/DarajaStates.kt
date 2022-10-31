@@ -15,16 +15,13 @@
  */
 package com.github.daraja.utils
 
-sealed class DarajaStates<R>(
-    val data: R?
-) {
-    class LoadingToken<T>(data: T?) : DarajaStates<T>(data)
-    class TokenFetchedSuccess<T>(data: T) : DarajaStates<T>(data)
-    class TokenFetchedError<T>(data: T) : DarajaStates<T>(data)
-    class SendingOTPLoading<T>(data: T?) : DarajaStates<T>(data)
-    class SendingOTPSuccess<T>(data: T) : DarajaStates<T>(data)
-    class SendingOTPError<T>(data: T) : DarajaStates<T>(data)
-}
+import com.github.daraja.model.response.STKPushResponse
+
+data class DarajaStkPushState(
+    val accessToken: String = "",
+    val otpResult: STKPushResponse? = null,
+    val error: Throwable? = null
+)
 
 sealed class Resource<T>(
     val data: T? = null,

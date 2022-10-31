@@ -21,42 +21,106 @@ import com.github.daraja.di.DependenciesModule.provideMpesaService
 import com.github.daraja.di.DependenciesModule.provideOkHttpClient
 import com.github.daraja.di.DependenciesModule.provideRetrofit
 import com.github.daraja.model.requests.STKPushRequest
+import com.github.daraja.model.response.AccessTokenResponse
+import com.github.daraja.model.response.STKPushResponse
 import com.github.daraja.services.STKPushService
-import com.github.daraja.utils.DarajaStates
+import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) : IDarajaDriver {
-
-    private lateinit var token: String
+class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) :
+    IDarajaDriver {
 
     override fun performStkPush(stkPushRequest: STKPushRequest) = flow {
         val firstSTKPushService = getInstance()
+        val darajaStkPushState = DarajaStkPushState()
 
-        emit(DarajaStates.LoadingToken(null))
+        emit(
+            Resource.Loading(
+                darajaStkPushState
+            )
+        )
 
-        try {
+        when (val getAccessTokenResult = getAccessToken(firstSTKPushService)) {
+            is Resource.Error -> {
+                emit(
+                    Resource.Error(
+                        data = darajaStkPushState.copy(
+                            error = getAccessTokenResult.error
+                        ),
+                        throwable = getAccessTokenResult.error!!
+                    )
+                )
+            }
+            is Resource.Success -> {
+                emit(
+                    Resource.Loading(
+                        darajaStkPushState.copy(
+                            accessToken = getAccessTokenResult.data!!.accessToken
+                        )
+                    )
+                )
+
+                when (val sendOtpResult =
+                    sendOtp(
+                        firstSTKPushService = firstSTKPushService,
+                        stkPushRequest = stkPushRequest,
+                        token = getAccessTokenResult.data.accessToken
+                    )
+                ) {
+                    is Resource.Error -> {
+                        emit(
+                            Resource.Error(
+                                data = darajaStkPushState.copy(
+                                    error = sendOtpResult.error
+                                ),
+                                throwable = sendOtpResult.error!!
+                            )
+                        )
+                    }
+                    is Resource.Success -> {
+                        emit(
+                            Resource.Success(
+                                darajaStkPushState.copy(
+                                    otpResult = sendOtpResult.data
+                                )
+                            )
+                        )
+                    }
+                    else -> {}
+                }
+            }
+            else -> {}
+        }
+
+    }.flowOn(Dispatchers.IO)
+
+    override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {
+        return try {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
 
             val response = firstSTKPushService.accessToken(authToken)
-            emit(DarajaStates.TokenFetchedSuccess(Resource.Success(response)))
-            token = response.accessToken
+            Resource.Success(response)
         } catch (e: Exception) {
-            emit(DarajaStates.TokenFetchedError(Resource.Error(throwable = e, data = null)))
+            return Resource.Error(e)
         }
+    }
 
-        emit(DarajaStates.SendingOTPLoading(null))
-
-        try {
+    override suspend fun sendOtp(
+        token: String,
+        firstSTKPushService: STKPushService,
+        stkPushRequest: STKPushRequest
+    ): Resource<STKPushResponse> {
+        return try {
             val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
-            emit(DarajaStates.SendingOTPSuccess(Resource.Success(data = response)))
+            Resource.Success(response)
         } catch (e: Exception) {
-            emit(DarajaStates.SendingOTPError(Resource.Error(e)))
+            return Resource.Error(e)
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
     private fun getInstance(): STKPushService {
         val loggingInterceptor = provideLoggingInterceptor()

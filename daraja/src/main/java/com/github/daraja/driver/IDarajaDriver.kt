@@ -16,10 +16,21 @@
 package com.github.daraja.driver
 
 import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.utils.DarajaStates
+import com.github.daraja.model.response.AccessTokenResponse
+import com.github.daraja.model.response.STKPushResponse
+import com.github.daraja.services.STKPushService
+import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface IDarajaDriver {
-    fun performStkPush(stkPushRequest: STKPushRequest): Flow<DarajaStates<out Resource<out Any>>>
+    fun performStkPush(stkPushRequest: STKPushRequest): Flow<Resource<DarajaStkPushState>>
+
+    suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse>
+
+    suspend fun sendOtp(
+        token: String,
+        firstSTKPushService: STKPushService,
+        stkPushRequest: STKPushRequest
+    ): Resource<STKPushResponse>
 }

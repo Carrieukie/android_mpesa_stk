@@ -16,6 +16,7 @@
 package com.example.daraja
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Arrangement
@@ -36,10 +37,11 @@ import androidx.lifecycle.lifecycleScope
 import com.example.daraja.ui.theme.DarajaTheme
 import com.github.daraja.driver.DarajaDriver
 import com.github.daraja.model.requests.STKPushRequest
+import com.github.daraja.utils.Resource
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
@@ -48,13 +50,14 @@ class MainActivity : ComponentActivity() {
         setContent {
             DarajaTheme {
                 Column(
-                    Modifier.padding(16.dp)
+                    Modifier
+                        .padding(16.dp)
                         .fillMaxWidth()
                         .fillMaxHeight(.4F),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    val phoneState = remember { mutableStateOf(TextFieldValue("0710102720")) }
+                    val phoneState = remember { mutableStateOf(TextFieldValue("0706003891")) }
                     TextField(
                         placeholder = { Text(text = "Enter phone number") },
                         value = phoneState.value,
@@ -99,7 +102,27 @@ class MainActivity : ComponentActivity() {
         )
 
         lifecycleScope.launch {
-            darajaDriver.performStkPush(stkPushRequest).collect()
+            darajaDriver.performStkPush(stkPushRequest).collectLatest { result ->
+                when (result) {
+                    is Resource.Error -> {
+                        Toast.makeText(
+                            applicationContext,
+                            "${result.error?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                    is Resource.Loading -> {
+                        Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
+                    }
+                    is Resource.Success -> {
+                        Toast.makeText(
+                            applicationContext,
+                            "Success: ${result.data?.otpResult?.message}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
         }
     }
 }
