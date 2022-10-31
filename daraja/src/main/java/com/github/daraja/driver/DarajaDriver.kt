@@ -34,6 +34,8 @@ import kotlinx.coroutines.flow.flowOn
 class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) :
     IDarajaDriver {
 
+    private val ioDispatcher = Dispatchers.IO
+
     override fun performStkPush(stkPushRequest: STKPushRequest) = flow {
         val firstSTKPushService = getInstance()
         val darajaStkPushState = DarajaStkPushState()
@@ -94,10 +96,10 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
             else -> {}
         }
 
-    }.flowOn(Dispatchers.IO)
+    }.flowOn(ioDispatcher)
 
     override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {
-        return safeApiCall(Dispatchers.IO) {
+        return safeApiCall(ioDispatcher) {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
 
@@ -111,7 +113,7 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
         firstSTKPushService: STKPushService,
         stkPushRequest: STKPushRequest
     ): Resource<STKPushResponse> {
-        return safeApiCall(Dispatchers.IO) {
+        return safeApiCall(ioDispatcher) {
             val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
             response
         }
