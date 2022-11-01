@@ -21,42 +21,103 @@ import com.github.daraja.di.DependenciesModule.provideMpesaService
 import com.github.daraja.di.DependenciesModule.provideOkHttpClient
 import com.github.daraja.di.DependenciesModule.provideRetrofit
 import com.github.daraja.model.requests.STKPushRequest
+import com.github.daraja.model.response.AccessTokenResponse
+import com.github.daraja.model.response.STKPushResponse
 import com.github.daraja.services.STKPushService
-import com.github.daraja.utils.DarajaStates
+import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
+import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 
-class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) : IDarajaDriver {
+class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) :
+    IDarajaDriver {
 
-    private lateinit var token: String
+    private val ioDispatcher = Dispatchers.IO
 
     override fun performStkPush(stkPushRequest: STKPushRequest) = flow {
         val firstSTKPushService = getInstance()
+        val darajaStkPushState = DarajaStkPushState()
 
-        emit(DarajaStates.LoadingToken(null))
+        emit(
+            Resource.Loading(
+                darajaStkPushState
+            )
+        )
 
-        try {
+        when (val accessTokenResult = getAccessToken(firstSTKPushService)) {
+            is Resource.Error -> {
+                emit(
+                    Resource.Error(
+                        errorMessage = accessTokenResult.errorMessage,
+                        throwable = accessTokenResult.error
+                    )
+                )
+            }
+            is Resource.Success -> {
+                emit(
+                    Resource.Loading(
+                        accessTokenResult.data?.let {
+                            darajaStkPushState.copy(
+                                accessToken = it.accessToken
+                            )
+                        }
+                    )
+                )
+
+                when (val sendOtpResult =
+                    accessTokenResult.data?.let {
+                        sendOtp(
+                            firstSTKPushService = firstSTKPushService,
+                            stkPushRequest = stkPushRequest,
+                            token = it.accessToken
+                        )
+                    }
+                ) {
+                    is Resource.Error -> {
+                        emit(
+                            Resource.Error(
+                                errorMessage = sendOtpResult.errorMessage,
+                                throwable = sendOtpResult.error
+                            )
+                        )
+                    }
+                    is Resource.Success -> {
+                        emit(
+                            Resource.Success(
+                                darajaStkPushState.copy(otpResult = sendOtpResult.data)
+                            )
+                        )
+                    }
+                    else -> {}
+                }
+            }
+            else -> {}
+        }
+
+    }.flowOn(ioDispatcher)
+
+    override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {
+        return safeApiCall(ioDispatcher) {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
 
             val response = firstSTKPushService.accessToken(authToken)
-            emit(DarajaStates.TokenFetchedSuccess(Resource.Success(response)))
-            token = response.accessToken
-        } catch (e: Exception) {
-            emit(DarajaStates.TokenFetchedError(Resource.Error(throwable = e, data = null)))
+            response
         }
+    }
 
-        emit(DarajaStates.SendingOTPLoading(null))
-
-        try {
+    override suspend fun sendOtp(
+        token: String,
+        firstSTKPushService: STKPushService,
+        stkPushRequest: STKPushRequest
+    ): Resource<STKPushResponse> {
+        return safeApiCall(ioDispatcher) {
             val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
-            emit(DarajaStates.SendingOTPSuccess(Resource.Success(data = response)))
-        } catch (e: Exception) {
-            emit(DarajaStates.SendingOTPError(Resource.Error(e)))
+            response
         }
-    }.flowOn(Dispatchers.IO)
+    }
 
     private fun getInstance(): STKPushService {
         val loggingInterceptor = provideLoggingInterceptor()
