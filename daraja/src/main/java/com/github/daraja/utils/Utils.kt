@@ -47,7 +47,7 @@ fun getPassword(businessShortCode: String, passkey: String, timestamp: String): 
     return Base64.encodeToString(str.toByteArray(), Base64.NO_WRAP)
 }
 
-suspend fun <T> safeApiCall(
+internal suspend fun <T> safeApiCall(
     dispatcher: CoroutineDispatcher,
     apiCall: suspend () -> T
 ): Resource<T> {
@@ -83,7 +83,7 @@ private fun convertStringErrorResponseToJsonObject(jsonString: String): ErrorRes
     return gson.fromJson(jsonString, ErrorResponse::class.java)
 }
 
-fun errorBodyAsString(throwable: HttpException): String? {
+private fun errorBodyAsString(throwable: HttpException): String? {
     val reader = throwable.response()?.errorBody()?.charStream()
     return reader?.use { it.readText() }
 }
