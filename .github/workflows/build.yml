@@ -25,7 +25,7 @@ jobs:
             echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY }} >> local.properties
             echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }} >> local.properties
             echo PASS_KEY=${{ secrets.PASS_KEY }} >> local.properties
-            cat apikey.properties
+            cat local.properties
 
       - name: Clean
         run: ./gradlew clean
