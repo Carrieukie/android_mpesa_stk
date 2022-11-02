@@ -56,15 +56,11 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
                 )
             }
             is Resource.Success -> {
-                emit(
-                    Resource.Loading(
-                        accessTokenResult.data?.let {
-                            darajaStkPushState.copy(
-                                accessToken = it.accessToken
-                            )
-                        }
+                accessTokenResult.data?.let {
+                    darajaStkPushState.copy(
+                        accessToken = it.accessToken
                     )
-                )
+                }
 
                 when (val sendOtpResult =
                     accessTokenResult.data?.let {
