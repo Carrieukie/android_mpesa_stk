@@ -1,2 +1,2 @@
-# android_mpesa_stk
+# Android Mpesa STK
 Android Mpesa library to initiate stk push
