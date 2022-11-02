@@ -15,9 +15,29 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+          
+      - name: Access API Keys
+        run: |
+            touch local.properties
+            echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY }} >> local.properties
+            echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }} >> local.properties
+            echo PASS_KEY=${{ secrets.PASS_KEY }} >> local.properties
+            cat local.properties 
+
+      - name: Clean
+        run: ./gradlew clean
+
+      - name: Test
+        run: ./gradlew -xtest
+
+      - name: Lint Check
+        run: ./gradlew -xlint
 
       - name: Build with Gradle
         run: ./gradlew assembleDebug
+
+      - name: Check MavenPublish
+        run: ./gradlew publishToMavenLocal
 
       - name: Upload a Build Artifact (APK)
         uses: actions/upload-artifact@v2.2.4
