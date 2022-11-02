@@ -18,6 +18,14 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
+          
+      - name: Access API Keys
+        run: |
+            touch local.properties
+            echo CONSUMER_KEY=${{ secrets.CONSUMER_KEY }} >> local.properties
+            echo CONSUMER_SECRET=${{ secrets.CONSUMER_SECRET }} >> local.properties
+            echo PASS_KEY=${{ secrets.PASS_KEY }} >> local.properties
+            cat apikey.properties
 
       - name: Clean
         run: ./gradlew clean
