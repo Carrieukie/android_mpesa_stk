@@ -30,6 +30,9 @@ dependencies {
 }
 ```
 
+## Usage
+>>>>>>>>>> WIP 🔨🔨🔨
+
 # License
 ```xml
 Copyright 2022 Carrieukie
