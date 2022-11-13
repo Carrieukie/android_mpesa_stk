@@ -31,7 +31,55 @@ dependencies {
 ```
 
 ## Usage
->>>>>>>>>> WIP 🔨🔨🔨
+Copy this fuction into your `Activity`/`Fragment`/`Composable` and replace with your credentials.
+
+``` Kotlin
+private fun sendStkPush(amount: String, phoneNumber: String) {
+    val stkPushRequest = STKPushRequest(
+        businessShortCode = BUSINESS_SHORT_CODE,
+        password = getPassword(BUSINESS_SHORT_CODE, PASS_KEY, timestamp),
+        timestamp = timestamp,
+        transactionType = "CustomerPayBillOnline",
+        amount = amount,
+        partyA = sanitizePhoneNumber(phoneNumber),
+        partyB = BUSINESS_SHORT_CODE,
+        phoneNumber = sanitizePhoneNumber(phoneNumber),
+        callBackURL = CALLBACKURL,
+        accountReference = "Dlight", // Account reference
+        transactionDesc = "Dlight STK PUSH" // Transaction description
+    )
+
+    val darajaDriver = DarajaDriver(
+        consumerKey = BuildConfig.CONSUMER_KEY,
+        consumerSecret = BuildConfig.CONSUMER_SECRET
+    )
+
+    lifecycleScope.launch {
+        darajaDriver.performStkPush(stkPushRequest).collectLatest { result ->
+            when (result) {
+                is Resource.Error -> {
+                    Toast.makeText(
+                        applicationContext,
+                        "${result.errorMessage ?: result.error?.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                is Resource.Loading -> {
+                    Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Success -> {
+                    Toast.makeText(
+                        applicationContext,
+                        "${result.data?.otpResult?.customerMessage}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+        }
+    }
+}
+```
+
 
 # License
 ```xml
