@@ -38,10 +38,11 @@ import kotlinx.coroutines.withContext
 class DarajaDriverTwoPointO(private val consumerKey: String, private val consumerSecret: String) :
     IDriverTwoPoint0 {
 
-    // an observable flow of Daraja state
+    // an observable state holder observable  of Daraja state
+    // private to this class
     private val _darajaState = MutableStateFlow(DarajaState())
 
-    // an immutable observable exposed to the UI
+    // an immutable state holder observable exposed to the UI
     val darajaState: StateFlow<DarajaState> = _darajaState
 
     // Dispatcher for offloading blocking IO tasks to a shared pool of threads.
