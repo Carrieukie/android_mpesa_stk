@@ -1,4 +1,4 @@
-package com.github.daraja.drivertwo
+package com.github.daraja.drivertwopointo
 
 data class DarajaState(
     val message: String = String(),

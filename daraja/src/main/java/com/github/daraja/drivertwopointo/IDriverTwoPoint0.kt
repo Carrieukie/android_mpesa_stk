@@ -1,4 +1,4 @@
-package com.github.daraja.drivertwo
+package com.github.daraja.drivertwopointo
 
 import com.github.daraja.model.requests.STKPushRequest
 

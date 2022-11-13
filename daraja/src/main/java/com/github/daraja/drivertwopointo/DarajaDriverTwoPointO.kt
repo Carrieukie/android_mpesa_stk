@@ -1,4 +1,4 @@
-package com.github.daraja.drivertwo
+package com.github.daraja.drivertwopointo
 
 import android.util.Base64
 import com.github.daraja.di.DependenciesModule.provideLoggingInterceptor
@@ -31,44 +31,43 @@ class DarajaDriverTwoPointO(private val consumerKey: String, private val consume
     private var bearerToken: String? = null
 
     override fun performStkPush(stkPushRequest: STKPushRequest) {
-        runCatching {
-            intent {
-                if (bearerToken == null) {
-                    getAccessToken().collect { accessTokenResponse ->
-                        when (accessTokenResponse) {
-                            is Resource.Error -> {
-                                reduce {
-                                    _darajaState.value.copy(
-                                        isLoading = false,
-                                        message = accessTokenResponse.errorMessage
-                                            ?: accessTokenResponse.error?.message
-                                            ?: "Something went wrong"
-                                    )
-                                }
+        intent {
+            if (bearerToken == null) {
+                getAccessToken().collect { accessTokenResponse ->
+                    when (accessTokenResponse) {
+                        is Resource.Error -> {
+                            reduce {
+                                _darajaState.value.copy(
+                                    message = accessTokenResponse.errorMessage
+                                        ?: accessTokenResponse.error?.message
+                                        ?: "Something went wrong",
+                                    isLoading = false
+                                )
                             }
-                            is Resource.Loading -> {
-                                reduce {
-                                    _darajaState.value.copy(
-                                        isLoading = false,
-                                        message = "Authenticating"
-                                    )
-                                }
+                        }
+                        is Resource.Loading -> {
+                            reduce {
+                                _darajaState.value.copy(
+                                    isLoading = true,
+                                    message = "Authenticating"
+                                )
                             }
-                            is Resource.Success -> {
-                                reduce {
-                                    _darajaState.value.copy(
-                                        isLoading = false,
-                                        message = "Successfully Authenticated"
-                                    )
-                                }
-                                bearerToken = accessTokenResponse.data?.accessToken ?: "makosha!!"
+                        }
+                        is Resource.Success -> {
+                            reduce {
+                                _darajaState.value.copy(
+                                    message = "Successfully Authenticated",
+                                    isLoading = false
+                                )
                             }
+                            bearerToken = accessTokenResponse.data?.accessToken
                         }
                     }
                 }
-
+            }
+            bearerToken?.let {
                 sendOtp(
-                    token = bearerToken!!,
+                    token = it,
                     stkPushRequest = stkPushRequest
                 ).collect { sendOtpResponse ->
                     when (sendOtpResponse) {
@@ -86,25 +85,21 @@ class DarajaDriverTwoPointO(private val consumerKey: String, private val consume
                             reduce {
                                 _darajaState.value.copy(
                                     message = "Sending Otp request",
-                                    isLoading = false
+                                    isLoading = true
                                 )
                             }
                         }
                         is Resource.Success -> {
                             reduce {
                                 _darajaState.value.copy(
-                                    message = "Otp sent successfully"
+                                    message = sendOtpResponse.data?.customerMessage ?: "Request sent successfully",
+                                    isLoading = false
                                 )
                             }
                         }
                     }
                 }
             }
-        }.onFailure { exception: Throwable ->
-            _darajaState.value = _darajaState.value.copy(
-                message = exception.localizedMessage ?: exception.message ?: "Makosha!",
-                isLoading = false
-            )
         }
     }
 
