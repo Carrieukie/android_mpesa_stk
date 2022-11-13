@@ -23,7 +23,7 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.POST
 
-interface STKPushService {
+interface DarajaService {
 
     @POST("mpesa/stkpush/v1/processrequest")
     suspend fun sendPush(

@@ -21,7 +21,7 @@ import com.github.daraja.di.DependenciesModule.provideMpesaService
 import com.github.daraja.di.DependenciesModule.provideOkHttpClient
 import com.github.daraja.di.DependenciesModule.provideRetrofit
 import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.services.STKPushService
+import com.github.daraja.services.DarajaService
 import com.github.daraja.utils.Resource
 import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.CoroutineScope
@@ -38,15 +38,31 @@ import kotlinx.coroutines.withContext
 class DarajaDriverTwoPointO(private val consumerKey: String, private val consumerSecret: String) :
     IDriverTwoPoint0 {
 
+    // an observable flow of Daraja state
     private val _darajaState = MutableStateFlow(DarajaState())
+
+    // an immutable observable exposed to the UI
     val darajaState: StateFlow<DarajaState> = _darajaState
 
+    // Dispatcher for offloading blocking IO tasks to a shared pool of threads.
     private val ioDispatcher = Dispatchers.IO
-    private val firstSTKPushService = getInstance()
+
+    // Instance of daraja service
+    private val darajaService = getInstance()
+
+    // bearer token used to make api calls to Daraja
     private var bearerToken: String? = null
 
+    /**
+     * Authenticates with daraja backend and initiates an stk push on customer device
+     * @param stkPushRequest: an object that contains parameters required to initiate an stk push
+     * @see <a href="https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate">MpesaExpressSimulate</a>
+     *
+     * @return unit
+     */
     override fun performStkPush(stkPushRequest: STKPushRequest) {
         intent {
+            // authenticate if bearer token  is null
             if (bearerToken == null) {
                 getAccessToken().collect { accessTokenResponse ->
                     when (accessTokenResponse) {
@@ -64,7 +80,7 @@ class DarajaDriverTwoPointO(private val consumerKey: String, private val consume
                             reduce {
                                 _darajaState.value.copy(
                                     isLoading = true,
-                                    message = "Authenticating"
+                                    message = "Authenticating daraja"
                                 )
                             }
                         }
@@ -118,40 +134,64 @@ class DarajaDriverTwoPointO(private val consumerKey: String, private val consume
         }
     }
 
+    /**
+     * Combines consumer key and secret to get a BASIC token which is used to make and api call
+     * that returns to us a bearer token that gives you a time bound access token to call allowed APIs.
+     * @see <a href="https://developer.safaricom.co.ke/APIs/Authorization">Safaricom Daraja</a>
+     *
+     * @return a flow builder Resource<out AccessTokenResponse>
+     */
     private suspend fun getAccessToken() = flow {
         emit(Resource.Loading(null))
 
         val response = safeApiCall(ioDispatcher) {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
-            val response = firstSTKPushService.accessToken(authToken)
+            val response = darajaService.accessToken(authToken)
             response
         }
 
         emit(response)
     }.flowOn(ioDispatcher)
 
-    private suspend fun sendOtp(
-        token: String,
-        stkPushRequest: STKPushRequest
-    ) = flow {
+    /**
+     * Makes an api call that initiates an STK push on behalf of the customer
+     * @param token : the bearer token that is got as a result of the first authorization api call
+     * @param stkPushRequest: an object that contains parameters required to initiate an stk push
+     * @see <a href="https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate">MpesaExpressSimulate</a>
+     *
+     */
+    private suspend fun sendOtp(token: String, stkPushRequest: STKPushRequest) = flow {
         emit(Resource.Loading(null))
 
         val response = safeApiCall(ioDispatcher) {
-            val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
+            val response = darajaService.sendPush(stkPushRequest, "Bearer $token")
             response
         }
 
         emit(response)
     }.flowOn(ioDispatcher)
 
-    private fun getInstance(): STKPushService {
+    /**
+     * Returns an instance of Daraja Service which is a retrofit implementation of the API endpoints
+     * defined by the service interface.
+     *
+     * @return DarajaService
+     */
+    private fun getInstance(): DarajaService {
         val loggingInterceptor = provideLoggingInterceptor()
         val okHttpClient = provideOkHttpClient(httpLoggingInterceptor = loggingInterceptor)
         val retrofit = provideRetrofit(okHttpClient = okHttpClient)
         return provideMpesaService(retrofit)
     }
 
+    /**
+     * Runs suspend function in a single couroutine context to prevent race conditions
+     * @param transform: Any suspend function that returns Unit
+     *
+     *
+     * @return Unit
+     */
     private fun intent(transform: suspend () -> Unit) {
         CoroutineScope(ioDispatcher).launch(SINGLE_THREAD) {
             transform()
