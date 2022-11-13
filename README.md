@@ -1,12 +1,18 @@
 <h1 align="center">android_mpesa_stk</h1>
 
-<p align="center">Android Mpesa library to initiate stk push</p>
+<p align="center">
+Android Mpesa library to initiate stk push
+</p>
 
 <p align="center">
     <a href="https://opensource.org/licenses/Apache-2.0"><img alt="License" src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"/></a>
   <a href="https://android-arsenal.com/api?level=21+"><img alt="API" src="https://img.shields.io/badge/API-15%2B-brightgreen.svg?style=flat"/></a>
   <a href="https://github.com/skydoves/AndroidVeil/actions"><img alt="Build Status" src="https://github.com/skydoves/TransformationLayout/workflows/Android%20CI/badge.svg"/></a> 
 </p><br>
+
+<p>
+MPESA just unveiled their new API, Daraja 2.0. It has been hailed as the height of developer heaven with its crisp clear structure, solid security and great syntax. So this library is a wrapper around the API to help you intiate MPESA STK push easily on your Android apps.
+</p>
 
 ## Download
 [![](https://jitpack.io/v/Carrieukie/android_mpesa_stk.svg)](https://jitpack.io/#Carrieukie/android_mpesa_stk)
