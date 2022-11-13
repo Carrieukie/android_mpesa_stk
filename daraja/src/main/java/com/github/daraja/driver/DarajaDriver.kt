@@ -24,7 +24,6 @@ import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.model.response.AccessTokenResponse
 import com.github.daraja.model.response.STKPushResponse
 import com.github.daraja.services.STKPushService
-import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
 import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.Dispatchers
@@ -66,14 +65,15 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
                     )
                 )
 
-                when (val sendOtpResult =
-                    accessTokenResult.data?.let {
-                        sendOtp(
-                            firstSTKPushService = firstSTKPushService,
-                            stkPushRequest = stkPushRequest,
-                            token = it.accessToken
-                        )
-                    }
+                when (
+                    val sendOtpResult =
+                        accessTokenResult.data?.let {
+                            sendOtp(
+                                firstSTKPushService = firstSTKPushService,
+                                stkPushRequest = stkPushRequest,
+                                token = it.accessToken
+                            )
+                        }
                 ) {
                     is Resource.Error -> {
                         emit(
@@ -95,7 +95,6 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
             }
             else -> {}
         }
-
     }.flowOn(ioDispatcher)
 
     override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {

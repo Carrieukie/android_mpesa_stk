@@ -35,9 +35,9 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.lifecycleScope
 import com.example.daraja.ui.theme.DarajaTheme
-import com.github.daraja.driver.DarajaDriver
+import com.github.daraja.drivertwo.DarajaDriverTwoPointO
+import com.github.daraja.drivertwo.DarajaState
 import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.utils.Resource
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp
@@ -45,6 +45,12 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val darajaDriver = DarajaDriverTwoPointO(
+        consumerKey = BuildConfig.CONSUMER_KEY,
+        consumerSecret = BuildConfig.CONSUMER_SECRET
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -79,6 +85,15 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        observeDarajaState()
+    }
+
+    private fun observeDarajaState() {
+        lifecycleScope.launch {
+            darajaDriver.darajaState.collectLatest { darajaState: DarajaState ->
+                Toast.makeText(this@MainActivity, darajaState.message, Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     private fun sendStkPush(amount: String, phoneNumber: String) {
@@ -95,34 +110,6 @@ class MainActivity : ComponentActivity() {
             accountReference = "Dlight", // Account reference
             transactionDesc = "Dlight STK PUSH " // Transaction description
         )
-
-        val darajaDriver = DarajaDriver(
-            consumerKey = BuildConfig.CONSUMER_KEY,
-            consumerSecret = BuildConfig.CONSUMER_SECRET
-        )
-
-        lifecycleScope.launch {
-            darajaDriver.performStkPush(stkPushRequest).collectLatest { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        Toast.makeText(
-                            applicationContext,
-                            "${result.errorMessage ?: result.error?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    is Resource.Loading -> {
-                        Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
-                    }
-                    is Resource.Success -> {
-                        Toast.makeText(
-                            applicationContext,
-                            "${result.data?.otpResult?.customerMessage}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        }
+        darajaDriver.performStkPush(stkPushRequest)
     }
 }

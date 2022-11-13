@@ -19,7 +19,6 @@ import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.model.response.AccessTokenResponse
 import com.github.daraja.model.response.STKPushResponse
 import com.github.daraja.services.STKPushService
-import com.github.daraja.utils.DarajaStkPushState
 import com.github.daraja.utils.Resource
 import kotlinx.coroutines.flow.Flow
 
