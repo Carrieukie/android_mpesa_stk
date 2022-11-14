@@ -15,14 +15,6 @@
  */
 package com.github.daraja.utils
 
-import com.github.daraja.model.response.STKPushResponse
-
-data class DarajaStkPushState(
-    val accessToken: String = "",
-    val otpResult: STKPushResponse? = null,
-    val error: Throwable? = null
-)
-
 sealed class Resource<T>(
     val data: T? = null,
     val error: Throwable? = null,

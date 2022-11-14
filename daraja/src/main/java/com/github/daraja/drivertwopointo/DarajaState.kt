@@ -13,16 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.daraja.model.response
+package com.github.daraja.drivertwopointo
 
-
-import com.google.gson.annotations.SerializedName
-
-data class ErrorResponse(
-    @field:SerializedName("errorCode")
-    val errorCode: String,
-    @field:SerializedName("errorMessage")
-    val errorMessage: String,
-    @field:SerializedName("requestId")
-    val requestId: String
+data class DarajaState(
+    val message: String = String(),
+    val isLoading: Boolean = false
 )

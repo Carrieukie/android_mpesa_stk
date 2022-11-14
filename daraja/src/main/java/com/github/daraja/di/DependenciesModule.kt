@@ -17,7 +17,7 @@ package com.github.daraja.di
 
 import android.annotation.SuppressLint
 import com.github.daraja.BuildConfig
-import com.github.daraja.services.STKPushService
+import com.github.daraja.services.DarajaService
 import com.github.daraja.utils.Constants
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
@@ -86,7 +86,7 @@ object DependenciesModule {
         HttpLoggingInterceptor.Level.NONE
     }
 
-    internal fun provideMpesaService(retrofit: Retrofit): STKPushService {
-        return retrofit.create(STKPushService::class.java)
+    internal fun provideMpesaService(retrofit: Retrofit): DarajaService {
+        return retrofit.create(DarajaService::class.java)
     }
 }

@@ -23,8 +23,7 @@ import com.github.daraja.di.DependenciesModule.provideRetrofit
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.model.response.AccessTokenResponse
 import com.github.daraja.model.response.STKPushResponse
-import com.github.daraja.services.STKPushService
-import com.github.daraja.utils.DarajaStkPushState
+import com.github.daraja.services.DarajaService
 import com.github.daraja.utils.Resource
 import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.Dispatchers
@@ -66,14 +65,15 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
                     )
                 )
 
-                when (val sendOtpResult =
-                    accessTokenResult.data?.let {
-                        sendOtp(
-                            firstSTKPushService = firstSTKPushService,
-                            stkPushRequest = stkPushRequest,
-                            token = it.accessToken
-                        )
-                    }
+                when (
+                    val sendOtpResult =
+                        accessTokenResult.data?.let {
+                            sendOtp(
+                                firstDarajaService = firstSTKPushService,
+                                stkPushRequest = stkPushRequest,
+                                token = it.accessToken
+                            )
+                        }
                 ) {
                     is Resource.Error -> {
                         emit(
@@ -95,31 +95,30 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
             }
             else -> {}
         }
-
     }.flowOn(ioDispatcher)
 
-    override suspend fun getAccessToken(firstSTKPushService: STKPushService): Resource<AccessTokenResponse> {
+    override suspend fun getAccessToken(firstDarajaService: DarajaService): Resource<AccessTokenResponse> {
         return safeApiCall(ioDispatcher) {
             val keys = "$consumerKey:$consumerSecret"
             val authToken = "Basic " + Base64.encodeToString(keys.toByteArray(), Base64.NO_WRAP)
 
-            val response = firstSTKPushService.accessToken(authToken)
+            val response = firstDarajaService.accessToken(authToken)
             response
         }
     }
 
     override suspend fun sendOtp(
         token: String,
-        firstSTKPushService: STKPushService,
+        firstDarajaService: DarajaService,
         stkPushRequest: STKPushRequest
     ): Resource<STKPushResponse> {
         return safeApiCall(ioDispatcher) {
-            val response = firstSTKPushService.sendPush(stkPushRequest, "Bearer $token")
+            val response = firstDarajaService.sendPush(stkPushRequest, "Bearer $token")
             response
         }
     }
 
-    private fun getInstance(): STKPushService {
+    private fun getInstance(): DarajaService {
         val loggingInterceptor = provideLoggingInterceptor()
         val okHttpClient = provideOkHttpClient(httpLoggingInterceptor = loggingInterceptor)
         val retrofit = provideRetrofit(okHttpClient = okHttpClient)

@@ -13,26 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.daraja.services
+package com.github.daraja.driver
 
-import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.model.response.AccessTokenResponse
 import com.github.daraja.model.response.STKPushResponse
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.Header
-import retrofit2.http.POST
 
-interface STKPushService {
+data class DarajaStkPushState(
+    val accessToken: String = "",
+    val otpResult: STKPushResponse? = null,
+    val error: Throwable? = null
+)
 
-    @POST("mpesa/stkpush/v1/processrequest")
-    suspend fun sendPush(
-        @Body stkPushRequest: STKPushRequest,
-        @Header("Authorization") auth: String
-    ): STKPushResponse
 
-    @GET("oauth/v1/generate?grant_type=client_credentials")
-    suspend fun accessToken(
-        @Header("Authorization") auth: String
-    ): AccessTokenResponse
-}

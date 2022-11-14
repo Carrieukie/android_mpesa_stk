@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.daraja.driver
+package com.github.daraja.services
 
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.model.response.AccessTokenResponse
 import com.github.daraja.model.response.STKPushResponse
-import com.github.daraja.services.DarajaService
-import com.github.daraja.utils.Resource
-import kotlinx.coroutines.flow.Flow
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
 
-interface IDarajaDriver {
-    fun performStkPush(stkPushRequest: STKPushRequest): Flow<Resource<DarajaStkPushState>>
+interface DarajaService {
 
-    suspend fun getAccessToken(firstDarajaService: DarajaService): Resource<AccessTokenResponse>
+    @POST("mpesa/stkpush/v1/processrequest")
+    suspend fun sendPush(
+        @Body stkPushRequest: STKPushRequest,
+        @Header("Authorization") auth: String
+    ): STKPushResponse
 
-    suspend fun sendOtp(
-        token: String,
-        firstDarajaService: DarajaService,
-        stkPushRequest: STKPushRequest
-    ): Resource<STKPushResponse>
+    @GET("oauth/v1/generate?grant_type=client_credentials")
+    suspend fun accessToken(
+        @Header("Authorization") auth: String
+    ): AccessTokenResponse
 }

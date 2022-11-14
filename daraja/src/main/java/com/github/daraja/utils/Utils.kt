@@ -57,7 +57,7 @@ internal suspend fun <T> safeApiCall(
         } catch (throwable: Throwable) {
             Timber.e(throwable)
             when (throwable) {
-                is IOException -> Resource.Error()
+                is IOException -> Resource.Error(errorMessage = "Please check your internet connection and try again later", throwable = throwable)
                 is HttpException -> {
                     val stringErrorBody = errorBodyAsString(throwable)
                     if (stringErrorBody != null) {
@@ -67,11 +67,11 @@ internal suspend fun <T> safeApiCall(
                             throwable = throwable
                         )
                     } else {
-                        Resource.Error(null, null)
+                        Resource.Error(errorMessage = "Unknown failure occurred, please try again later", throwable = throwable)
                     }
                 }
                 else -> {
-                    Resource.Error(null, null)
+                    Resource.Error(errorMessage = "Unknown failure occurred, please try again later", throwable = throwable)
                 }
             }
         }

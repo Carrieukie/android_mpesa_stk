@@ -16,35 +16,36 @@
 package com.example.daraja
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.graphics.Color.Companion.White
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
+import androidx.compose.ui.window.Dialog
 import com.example.daraja.ui.theme.DarajaTheme
-import com.github.daraja.driver.DarajaDriver
-import com.github.daraja.model.requests.STKPushRequest
-import com.github.daraja.utils.Resource
-import com.github.daraja.utils.getPassword
-import com.github.daraja.utils.sanitizePhoneNumber
-import com.github.daraja.utils.timestamp
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
+
+    private val viewModel by viewModels<MainViewModel>()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -52,75 +53,69 @@ class MainActivity : ComponentActivity() {
                 Column(
                     Modifier
                         .padding(16.dp)
-                        .fillMaxWidth()
-                        .fillMaxHeight(.4F),
+                        .fillMaxSize(),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.SpaceEvenly
+                    verticalArrangement = Arrangement.Center
                 ) {
-                    val phoneState = remember { mutableStateOf(TextFieldValue("0706003891")) }
                     TextField(
+                        modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(text = "Enter phone number") },
-                        value = phoneState.value,
-                        onValueChange = { phoneState.value = it }
+                        value = viewModel.phoneState.value,
+                        onValueChange = { viewModel.phoneState.value = it }
                     )
 
-                    val amount = remember { mutableStateOf(TextFieldValue("1")) }
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     TextField(
+                        modifier = Modifier.fillMaxWidth(),
                         placeholder = { Text(text = "Enter amount") },
-                        value = amount.value,
-                        onValueChange = { amount.value = it }
+                        value = viewModel.amount.value,
+                        onValueChange = { viewModel.amount.value = it }
                     )
+
+                    Spacer(modifier = Modifier.height(24.dp))
 
                     Button(onClick = {
-                        sendStkPush(amount.value.text, phoneState.value.text)
+                        viewModel.sendStkPush(
+                            viewModel.amount.value.text,
+                            viewModel.phoneState.value.text
+                        )
+                        viewModel.dialogState.value = true
                     }) {
                         Text(text = "Initiate Payment")
+                    }
+
+                    if (viewModel.dialogState.value) {
+                        DialogBoxLoading()
                     }
                 }
             }
         }
     }
 
-    private fun sendStkPush(amount: String, phoneNumber: String) {
-        val stkPushRequest = STKPushRequest(
-            businessShortCode = Constants.BUSINESS_SHORT_CODE,
-            password = getPassword(Constants.BUSINESS_SHORT_CODE, BuildConfig.PASS_KEY, timestamp),
-            timestamp = timestamp,
-            transactionType = "CustomerPayBillOnline",
-            amount = amount,
-            partyA = sanitizePhoneNumber(phoneNumber),
-            partyB = Constants.PARTYB,
-            phoneNumber = sanitizePhoneNumber(phoneNumber),
-            callBackURL = Constants.CALLBACKURL,
-            accountReference = "Dlight", // Account reference
-            transactionDesc = "Dlight STK PUSH " // Transaction description
-        )
-
-        val darajaDriver = DarajaDriver(
-            consumerKey = BuildConfig.CONSUMER_KEY,
-            consumerSecret = BuildConfig.CONSUMER_SECRET
-        )
-
-        lifecycleScope.launch {
-            darajaDriver.performStkPush(stkPushRequest).collectLatest { result ->
-                when (result) {
-                    is Resource.Error -> {
-                        Toast.makeText(
-                            applicationContext,
-                            "${result.errorMessage ?: result.error?.message}",
-                            Toast.LENGTH_SHORT
-                        ).show()
+    @Composable
+    fun DialogBoxLoading() {
+        Dialog(
+            onDismissRequest = { viewModel.dialogState.value = false }
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .background(White, shape = RoundedCornerShape(12.dp))
+                    .fillMaxWidth()
+            ) {
+                Column(
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier
+                ) {
+                    if (viewModel.darajaStates.collectAsState().value.isLoading) {
+                        CircularProgressIndicator(modifier = Modifier.padding(16.dp))
                     }
-                    is Resource.Loading -> {
-                        Toast.makeText(applicationContext, "Loading...", Toast.LENGTH_SHORT).show()
-                    }
-                    is Resource.Success -> {
-                        Toast.makeText(
-                            applicationContext,
-                            "${result.data?.otpResult?.customerMessage}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+                    Text(
+                        text = viewModel.darajaStates.collectAsState().value.message,
+                        Modifier.padding(8.dp)
+                    )
                 }
             }
         }
