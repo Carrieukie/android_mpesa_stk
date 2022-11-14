@@ -18,7 +18,7 @@ package com.example.daraja
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
-import com.github.daraja.drivertwopointo.DarajaDriverTwoPointO
+import com.github.daraja.driver.DarajaDriver
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
@@ -26,7 +26,7 @@ import com.github.daraja.utils.timestamp
 
 class MainViewModel : ViewModel() {
 
-    private val darajaDriver = DarajaDriverTwoPointO(
+    private val darajaDriver = DarajaDriver(
         consumerKey = BuildConfig.CONSUMER_KEY,
         consumerSecret = BuildConfig.CONSUMER_SECRET
     )

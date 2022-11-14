@@ -15,12 +15,8 @@
  */
 package com.github.daraja.driver
 
-import com.github.daraja.model.response.STKPushResponse
+import com.github.daraja.model.requests.STKPushRequest
 
-data class DarajaStkPushState(
-    val accessToken: String = "",
-    val otpResult: STKPushResponse? = null,
-    val error: Throwable? = null
-)
-
-
+interface IDriverTwo {
+    fun performStkPush(stkPushRequest: STKPushRequest)
+}
