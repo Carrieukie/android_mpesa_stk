@@ -38,11 +38,11 @@ import kotlinx.coroutines.withContext
 class DarajaDriverTwoPointO(private val consumerKey: String, private val consumerSecret: String) :
     IDriverTwoPoint0 {
 
-    // an observable state holder observable  of Daraja state
+    // an observable state holder observable of Daraja state
     // private to this class
     private val _darajaState = MutableStateFlow(DarajaState())
 
-    // an immutable state holder observable exposed to the UI
+    // an immutable state holder observable of Daraja state publicly exposed to its collectors
     val darajaState: StateFlow<DarajaState> = _darajaState
 
     // Dispatcher for offloading blocking IO tasks to a shared pool of threads.
@@ -136,7 +136,7 @@ class DarajaDriverTwoPointO(private val consumerKey: String, private val consume
     }
 
     /**
-     * Combines consumer key and secret to get a BASIC token which is used to make and api call
+     * Combines consumer key and secret to get a BASIC token which is used to make an api call
      * that returns to us a bearer token that gives you a time bound access token to call allowed APIs.
      * @see <a href="https://developer.safaricom.co.ke/APIs/Authorization">Safaricom Daraja</a>
      *
