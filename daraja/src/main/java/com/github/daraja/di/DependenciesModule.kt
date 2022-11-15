@@ -19,6 +19,7 @@ import android.annotation.SuppressLint
 import com.github.daraja.BuildConfig
 import com.github.daraja.services.DarajaService
 import com.github.daraja.utils.Constants
+import com.github.daraja.utils.Environment
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -72,10 +73,11 @@ object DependenciesModule {
     }
 
     internal fun provideRetrofit(
-        okHttpClient: OkHttpClient
+        okHttpClient: OkHttpClient,
+        environment: Environment
     ): Retrofit {
         return Retrofit.Builder()
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(environment.url)
             .addConverterFactory(GsonConverterFactory.create()).client(okHttpClient)
             .build()
     }

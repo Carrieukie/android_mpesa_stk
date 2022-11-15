@@ -22,6 +22,7 @@ import com.github.daraja.di.DependenciesModule.provideOkHttpClient
 import com.github.daraja.di.DependenciesModule.provideRetrofit
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.services.DarajaService
+import com.github.daraja.utils.Environment
 import com.github.daraja.utils.Resource
 import com.github.daraja.utils.safeApiCall
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +36,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.newSingleThreadContext
 import kotlinx.coroutines.withContext
 
-class DarajaDriver(private val consumerKey: String, private val consumerSecret: String) :
+class DarajaDriver(
+    private val consumerKey: String,
+    private val consumerSecret: String,
+    private val environment: Environment
+) :
     IDriverTwo {
 
     // an observable state holder observable of Daraja state
@@ -124,7 +129,8 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
                         is Resource.Success -> {
                             reduce {
                                 _darajaState.value.copy(
-                                    message = sendOtpResponse.data?.customerMessage ?: "Request sent successfully",
+                                    message = sendOtpResponse.data?.customerMessage
+                                        ?: "Request sent successfully",
                                     isLoading = false
                                 )
                             }
@@ -182,7 +188,7 @@ class DarajaDriver(private val consumerKey: String, private val consumerSecret: 
     private fun getInstance(): DarajaService {
         val loggingInterceptor = provideLoggingInterceptor()
         val okHttpClient = provideOkHttpClient(httpLoggingInterceptor = loggingInterceptor)
-        val retrofit = provideRetrofit(okHttpClient = okHttpClient)
+        val retrofit = provideRetrofit(okHttpClient = okHttpClient, environment = environment)
         return provideMpesaService(retrofit)
     }
 
