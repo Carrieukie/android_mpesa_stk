@@ -19,11 +19,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import com.github.daraja.driver.DarajaDriver
+import com.github.daraja.driver.DarajaState
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.utils.Environment
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp
+import kotlinx.coroutines.flow.StateFlow
 
 class MainViewModel : ViewModel() {
 
@@ -36,7 +38,7 @@ class MainViewModel : ViewModel() {
     val phoneState = mutableStateOf(TextFieldValue("0710102720"))
     val amount = mutableStateOf(TextFieldValue("1"))
     val dialogState = mutableStateOf(false)
-    val darajaStates = darajaDriver.darajaState
+    val darajaStates: StateFlow<DarajaState> = darajaDriver.darajaState
 
     fun sendStkPush(amount: String, phoneNumber: String) {
         val stkPushRequest = STKPushRequest(
