@@ -15,6 +15,8 @@
  */
 package com.github.daraja.model.requests
 
+import com.github.daraja.utils.TransactionType
+import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 
 /**
@@ -69,8 +71,8 @@ data class STKPushRequest(
     @field:SerializedName("Timestamp")
     val timestamp: String,
 
-    @field:SerializedName("TransactionType")
-    val transactionType: String,
+    @Transient
+    val mpesaTransactionType: TransactionType,
 
     @field:SerializedName("Amount")
     val amount: String,
@@ -93,4 +95,7 @@ data class STKPushRequest(
     @field:SerializedName("TransactionDesc")
     val transactionDesc: String
 
-)
+) {
+    @field:SerializedName("TransactionType")
+    val transactionType: String = mpesaTransactionType.type
+}

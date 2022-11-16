@@ -22,6 +22,7 @@ import com.github.daraja.driver.DarajaDriver
 import com.github.daraja.driver.DarajaState
 import com.github.daraja.model.requests.STKPushRequest
 import com.github.daraja.utils.Environment
+import com.github.daraja.utils.TransactionType
 import com.github.daraja.utils.getPassword
 import com.github.daraja.utils.sanitizePhoneNumber
 import com.github.daraja.utils.timestamp
@@ -45,7 +46,7 @@ class MainViewModel : ViewModel() {
             businessShortCode = Constants.BUSINESS_SHORT_CODE,
             password = getPassword(Constants.BUSINESS_SHORT_CODE, BuildConfig.PASS_KEY, timestamp),
             timestamp = timestamp,
-            transactionType = "CustomerPayBillOnline",
+            mpesaTransactionType = TransactionType.CustomerPayBillOnline("cddc"),
             amount = amount,
             partyA = sanitizePhoneNumber(phoneNumber),
             partyB = Constants.PARTYB,
