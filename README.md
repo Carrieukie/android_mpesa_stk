@@ -55,7 +55,7 @@ private val stkPushRequest = STKPushRequest(
         businessShortCode = BUSINESS_SHORT_CODE,
         password = getPassword(BUSINESS_SHORT_CODE, PASS_KEY, timestamp),
         timestamp = timestamp,
-        transactionType = "CustomerPayBillOnline",
+        mpesaTransactionType = TransactionType.CustomerPayBillOnline(),
         amount = amount,
         partyA = sanitizePhoneNumber(phoneNumber),
         partyB = BUSINESS_SHORT_CODE,
@@ -68,7 +68,7 @@ private val stkPushRequest = STKPushRequest(
 
 
 * `businessShortCode` - This is organizations shortcode (Paybill or Buygoods - A 5 to 7 digit account number) used to identify an organization and receive the transaction.
-* `password` - This is the password used for encrypting the request sent: A base64 encoded string. (The base64 string is a combination of Shortcode+Passkey+Timestamp)
+* `password` - This is the password used for encrypting the request sent: A base64 encoded string. (The base64 string is a combination of Shortcode+Passkey+Timestamp). For sandbox, get the passkey from the simulator. But for production, use the above url to generate one.
 * `timestamp` - pass in `timestamp` from `com.github.daraja.utils.timestamp` which will generate the timestamp for you. This is the Timestamp of the transaction, normally in the formart of `YEAR+MONTH+DATE+HOUR+MINUTE+SECOND (YYYYMMDDHHMMSS)` Each part should be atleast two digits apart from the year which takes four digits. Use the method `com.github.daraja.utils.getPassword`
 * `transactionType` - This is the transaction type that is used to identify the transaction when sending the request to M-Pesa. The transaction type for M-Pesa Express is "CustomerPayBillOnline"
 * `amount` - This is the Amount transacted normaly a numeric value. Money that customer pays to the Shorcode. Only whole numbers are supported.

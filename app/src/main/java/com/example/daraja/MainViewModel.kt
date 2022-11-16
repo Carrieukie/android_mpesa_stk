@@ -46,7 +46,7 @@ class MainViewModel : ViewModel() {
             businessShortCode = Constants.BUSINESS_SHORT_CODE,
             password = getPassword(Constants.BUSINESS_SHORT_CODE, BuildConfig.PASS_KEY, timestamp),
             timestamp = timestamp,
-            mpesaTransactionType = TransactionType.CustomerPayBillOnline("cddc"),
+            mpesaTransactionType = TransactionType.CustomerPayBillOnline(),
             amount = amount,
             partyA = sanitizePhoneNumber(phoneNumber),
             partyB = Constants.PARTYB,
