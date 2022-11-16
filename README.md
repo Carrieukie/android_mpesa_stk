@@ -79,7 +79,7 @@ private val stkPushRequest = STKPushRequest(
 * `accountReference` - Any combinations of letters and numbers
 *  `transactionDesc` - This is any additional information/comment that can be sent along with the request from your system. Maximum of 13 Characters.
 
-> Simulate from here : https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate and get your values from this simulation
+> Simulate from here : https://developer.safaricom.co.ke/APIs/MpesaExpressSimulate and get your values from this simulator
 
 
 Use `darajaDriver` object to make `stkPushRequest`
