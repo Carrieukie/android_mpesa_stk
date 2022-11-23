@@ -32,7 +32,7 @@ And add the dependency below to your **module**'s `build.gradle` file:
 
 ```gradle
 dependencies {
-    implementation 'com.github.Carrieukie:android_mpesa_stk:v1.0.2-beta'
+	        implementation 'com.github.Carrieukie:android_mpesa_stk:Tag'
 }
 ```
 
