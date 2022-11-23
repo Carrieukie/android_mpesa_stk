@@ -114,6 +114,17 @@ This does not show the transaction status after the api call is sent. See this b
 
 > See : https://otieno.medium.com/android-mpesa-integration-using-daraja-library-part-2-5e5d07813963
 
+# Cloning
+
+After cloning the sample app, add these fields in your local.properties file. 
+> Get the test credentials from Here : https://developer.safaricom.co.ke/test_credentials
+
+```
+CONSUMER_KEY = //Enter your own consumer key
+CONSUMER_SECRET = // Enter your own consumer secret
+PASS_KEY = // Get your passkey from the simulate Mpesa exress simulator
+```
+
 # License
 ```xml
 Copyright 2022 Carrieukie
