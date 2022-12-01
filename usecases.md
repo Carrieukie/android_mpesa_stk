@@ -1,9 +1,9 @@
 # Who's using Searchable-Dropdown-Menu-Jetpack-Compose?
-If your product uses Searchable-Dropdown-Menu-Jetpack-Compose, welcome to contribute by creating a pull request or let me know through other contacts! 🤗
+If your product uses Android M-Pesa STK, welcome to contribute by creating a pull request or let me know through other contacts! 🤗
 
 # License
 ```xml
-Copyright 2020 breens-mbaka (Breens Mbaka)
+Copyright 2020 erick-kariuki (Erick Kariuki)
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
