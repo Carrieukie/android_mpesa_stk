@@ -125,6 +125,13 @@ CONSUMER_SECRET = // Enter your own consumer secret
 PASS_KEY = // Get your passkey from the simulate Mpesa exress simulator
 ```
 
+# Who's using Android M-Pesa STK?
+If your project uses Android M-Pesa STK, please let us know by creating a new issue! 😊
+
+# Find this repository useful? :heart:
+Support it by joining __[stargazers](https://github.com/Carrieukie/android_mpesa_stk/stargazers)__ for this repository. :star: <br>
+Also __[follow](https://github.com/Carrieukie)__ me for my next creations! 🤩
+
 # License
 ```xml
 Copyright 2022 Carrieukie
