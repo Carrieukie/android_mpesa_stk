@@ -1,4 +1,4 @@
-# Who's using Searchable-Dropdown-Menu-Jetpack-Compose?
+# Who's using Android M-Pesa STK?
 If your product uses Android M-Pesa STK, welcome to contribute by creating a pull request or let me know through other contacts! 🤗
 
 # License
