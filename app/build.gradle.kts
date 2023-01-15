@@ -31,7 +31,12 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
+
+        create("staging") {
+            initWith(getByName("debug"))
+            manifestPlaceholders["hostName"] = "internal.example.com"
+            applicationIdSuffix = ".debugStaging"
+        }    }
 
     buildTypes.all {
         val properties = Properties()

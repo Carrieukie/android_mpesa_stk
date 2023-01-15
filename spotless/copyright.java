@@ -1,5 +1,5 @@
 /*
- * Copyright $YEAR Eric Kariuki Kimani
+ * Copyright $YEAR Android M-pesa STK
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

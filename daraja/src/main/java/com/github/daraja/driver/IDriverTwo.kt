@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Eric Kariuki Kimani.
+ * Copyright 2022 Android M-pesa STK
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
