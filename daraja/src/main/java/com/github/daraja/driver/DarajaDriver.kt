@@ -131,7 +131,8 @@ class DarajaDriver(
                                 _darajaState.value.copy(
                                     message = sendOtpResponse.data?.customerMessage
                                         ?: "Request sent successfully",
-                                    isLoading = false
+                                    isLoading = false,
+                                    stkPushResponse = sendOtpResponse.data
                                 )
                             }
                         }

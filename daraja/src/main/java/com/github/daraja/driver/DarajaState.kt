@@ -15,7 +15,10 @@
  */
 package com.github.daraja.driver
 
+import com.github.daraja.model.response.STKPushResponse
+
 data class DarajaState(
     val message: String = String(),
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+    val stkPushResponse: STKPushResponse? = null
 )
