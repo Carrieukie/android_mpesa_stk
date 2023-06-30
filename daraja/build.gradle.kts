@@ -66,8 +66,8 @@ afterEvaluate {
             create<MavenPublication>("daraja") {
                 from(project.components["release"])
                 groupId = "com.github.Carrieukie"
-                artifactId = "image-preview-compose"
-                version = "1.0.0"
+                artifactId = "android_mpesa_stk"
+                version = "1.0.4"
             }
         }
     }
