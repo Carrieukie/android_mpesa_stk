@@ -67,7 +67,7 @@ afterEvaluate {
                 from(project.components["release"])
                 groupId = "com.github.Carrieukie"
                 artifactId = "android_mpesa_stk"
-                version = "1.0.4"
+                version = "1.0.5"
             }
         }
     }
