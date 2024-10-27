@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew publishToMavenLocal
 
       - name: Upload a Build Artifact (APK)
-        uses: actions/upload-artifact@4
+        uses: actions/upload-artifact@3
         with:
           name: app
           path: app/build/outputs/apk/debug/app-debug.apk
