@@ -16,7 +16,7 @@
 package com.github.daraja.utils
 
 internal object Constants {
-    const val CONNECT_TIMEOUT = 45 * 1000
-    const val READ_TIMEOUT = 45 * 1000
-    const val WRITE_TIMEOUT = 60 * 1000
+    const val CONNECT_TIMEOUT = 30 * 1000
+    const val READ_TIMEOUT = 30 * 1000
+    const val WRITE_TIMEOUT = 30 * 1000
 }
